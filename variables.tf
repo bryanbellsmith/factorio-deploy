@@ -12,3 +12,11 @@ variable "amis" {
 variable "ssh_key_name" {
   default = "Home"
 }
+
+variable "s3_bucket" {
+  default = "greydevilfactorio"
+}
+
+variable "port" {
+  default = "34197"
+}

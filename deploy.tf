@@ -6,7 +6,7 @@ provider "aws" {
 # create a security group that allows for all ports from my home IP address
 resource "aws_security_group" "home" {
   name = "home"
-  description = "allow inbound traffic from home"
+  description = "allow inbound traffic from home and port ${var.port}"
 
   ingress {
     from_port = 0
@@ -89,27 +89,27 @@ resource "aws_instance" "factorio" {
 
   provisioner "remote-exec" {
     inline = [
-      "aws s3api get-object --bucket greydevilfactorio --key factorio_headless_x64_0.15.40.tar.xz /tmp/factorio_headless_x64_0.15.40.tar.xz",
-      "tar -xf /tmp/factorio_headless_x64_0.15.40.tar.xz -C /opt",
-      "sudo useradd factorio",
-      "sudo chown -R factorio:factorio /opt/factorio",
-      "sudo su factorio",
-      "/opt/factorio/bin/x64/factorio --start-server /opt/factorio/saves/my-save.zip"
+        "aws s3api get-object --bucket greydevilfactorio --key factorio_headless_x64_0.15.40.tar.xz /tmp/factorio_headless_x64_0.15.40.tar.xz",
+        "tar -xf /tmp/factorio_headless_x64_0.15.40.tar.xz -C /tmp",
+        "sudo mv /tmp/factorio /opt/factorio",
+        "mkdir /opt/factorio/saves",
+        "aws s3api get-object --bucket greydevilfactorio --key saves/multi.zip /opt/factorio/saves/multi.zip",
+        "/opt/factorio/bin/x64/factorio --start-server /opt/factorio/saves/multi.zip"
     ]
-#    "/opt/factorio/bin/x64/factorio --create /opt/factorio/saves/my-save.zip" probably copy a save from S3?
-#    "aws s3api get-object --bucket greydevilfactorio --key my-save.zip /saves/my-save.zip"
-# need to grab mods from somewhere like S3 as well
-# building the glibc was a pain
-# https://forums.factorio.com/viewtopic.php?t=54654#p324493
-# instructions for the path and ld_library_path are incorrect
+
+# should this be s3fs instead?
+# need to grab mods from somewhere like S3 as well, probably recreate the rail map too
 # parameterize the name of the save
-# add the port 34197 to allow ingress to the security group
-# add ip:port output to allow for easier connecting to server
 # set up some default passwords for the server, perhaps have it join the multiplayer hosting via config (loaded from S3)
   }
 }
 
 # output the SSH url
-output "ssh_location" {
+output "ssh_url" {
   value = "ec2-user@${aws_instance.factorio.public_dns}"
+}
+
+# output the address for factorio
+output "factorio_address" {
+  value = "${aws_instance.factorio.public_dns}:${var.port}"
 }
