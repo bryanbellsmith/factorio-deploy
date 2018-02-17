@@ -94,9 +94,20 @@ resource "aws_instance" "factorio" {
         "sudo mv /tmp/factorio /opt/factorio",
         "mkdir /opt/factorio/saves",
         "aws s3api get-object --bucket greydevilfactorio --key saves/multi.zip /opt/factorio/saves/multi.zip",
-        "/opt/factorio/bin/x64/factorio --start-server /opt/factorio/saves/multi.zip"
     ]
 
+# need to start the server using scripts, rather than with command
+# https://github.com/Bisa/factorio-init
+# sudo yum install git -y
+# sudo git -C /opt clone https://github.com/Bisa/factorio-init.git
+# change the user and group
+# sudo cp /opt/factorio-init/factorio.service.example /etc/systemd/system/factorio.service
+# sudo systemctl daemon-reload
+# load saves from an EFS instance
+# need to add a map-settings.json so that we can create a save if one does not exist
+
+
+#        "/opt/factorio/bin/x64/factorio --start-server /opt/factorio/saves/multi.zip"
 # should this be s3fs instead?
 # need to grab mods from somewhere like S3 as well, probably recreate the rail map too
 # parameterize the name of the save

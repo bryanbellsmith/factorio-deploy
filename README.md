@@ -10,7 +10,9 @@ You must create an SSH key within your AWS account called "Home"
 
 You must put your SSH key .pem file in the file system above the aws-deploy project folder (so it is excluded from github)
 
-You must have an S3 bucket with the factorio headless server binaries
+You must have an S3 bucket with the factorio headless server binaries, server-settings.json
+
+Save files are loaded from an Amazon EFS instance with a name of factorio
 
 terraform plan
 terraform apply
